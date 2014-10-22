@@ -1,9 +1,7 @@
-tiles
+贴瓷砖问题
 =====
 
-some small rectangles to one big rectangle
-
-在如下表格（允许合并单元格）
+在如下尺寸的场地（表格，允许合并单元格）
 
 ```
 ┌─┬─┬─┬─┐
@@ -11,7 +9,7 @@ some small rectangles to one big rectangle
 └─┴─┴─┴─┘
 ```
 
-中放入如下随机排列的方形与矩形
+中，放入如下随机排列的方形与矩形，要求铺满并尽量保持原来顺序
 
 ```
 ■
