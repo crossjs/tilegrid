@@ -2,8 +2,6 @@
 
   'use strict';
 
-  // http://codepen.io/anon/pen/gvhDE
-
   function placeIsEmpty(canvas, index) {
     return canvas[index] === -1;
   }
