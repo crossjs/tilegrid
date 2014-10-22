@@ -1,89 +1,135 @@
-(function(global, document, undefined) {
+(function(global, undefined) {
 
   'use strict';
 
-  function placeIsEmpty(canvas, index) {
-    return canvas[index] === -1;
+  function TileGrid(data) {
+    var p;
+
+    if (data) {
+      for (p in data) {
+        this[p] = data[p];
+      }
+    }
   }
 
-  function placeBigger(canvas, index, tile) {
-    var slotIndex = index;
+  TileGrid.prototype.arrange = function() {
+    var tiles = this.tiles,
+      scope = this;
 
-    // 横版
-    if (tile[0] > 1) {
-      // 位置不够长，往回缩
-      while (slotIndex % 4 > 2) {
-        slotIndex--;
+    // 第一轮，排横版
+    tiles.forEach(function(tile, i) {
+      if (tile[0] > 1) {
+        scope.placeHor(i, tile);
       }
+    });
 
-      // 如果位置已经被占，重新安排原客人
-      if (!placeIsEmpty(canvas, slotIndex)) {
-        placeNormal(canvas, (slotIndex + 2) % 8, tile, [slotIndex, slotIndex + 1]);
+    // 第二轮，排竖版
+    tiles.forEach(function(tile, i) {
+      if (tile[1] > 1) {
+        scope.placeVer(i, tile);
       }
+    });
 
-      // 如果位置已经被占，重新安排原客人
-      if (!placeIsEmpty(canvas, slotIndex + 1)) {
-        placeNormal(canvas, (slotIndex + 3) % 8, tile, [slotIndex, slotIndex + 1]);
+    // 第三轮，排常规
+    tiles.forEach(function(tile, i) {
+      if (tile[0] === tile[1]) {
+        scope.placeNor(i, tile);
       }
+    });
 
-      // 占坑
-      canvas[slotIndex] = canvas[slotIndex + 1] = index;
+    return this;
+  };
 
-      // 画图
-      paint(tile, slotIndex, slotIndex + 1);
+  // FOR OVERRIDE
+  TileGrid.prototype.paint = function(tile, index, index2) {};
+
+  TileGrid.prototype.gridIsEmpty = function(index) {
+    return this.grids[index] === -1;
+  };
+
+  // 横版 2*1
+  TileGrid.prototype.placeHor = function(index, tile) {
+    var grids = this.grids,
+      slotIndex = index;
+
+    // 位置不够长，往回缩
+    while (slotIndex % 4 > 2) {
+      slotIndex--;
     }
-    // 竖版
-    else {
+
+    // 如果位置已经被占，重新安排
+    if (!this.gridIsEmpty(slotIndex)) {
+      this.placeNor((slotIndex + 2) % 8, tile, [slotIndex, slotIndex + 1]);
+    }
+
+    // 如果位置已经被占，重新安排
+    if (!this.gridIsEmpty(slotIndex + 1)) {
+      this.placeNor((slotIndex + 3) % 8, tile, [slotIndex, slotIndex + 1]);
+    }
+
+    // 占坑
+    grids[slotIndex] = grids[slotIndex + 1] = index;
+
+    // 画图
+    this.paint(tile, slotIndex, slotIndex + 1);
+  };
+
+  // 竖版 1*2
+  TileGrid.prototype.placeVer = function(index, tile) {
+    var grids = this.grids,
+      slotIndex = index;
+
+    if (slotIndex > 3) {
+      slotIndex = slotIndex % 4;
+    }
+
+    while (slotIndex !== -1 && !(this.gridIsEmpty(slotIndex) && this.gridIsEmpty(slotIndex + 4))) {
+      slotIndex++;
+
+      // 走到尽头，从头开始
       if (slotIndex > 3) {
-        slotIndex = slotIndex % 4;
+        slotIndex = 0;
       }
 
-      while (slotIndex !== -1 && !(placeIsEmpty(canvas, slotIndex) && placeIsEmpty(canvas, slotIndex + 4))) {
-        slotIndex++;
-
-        // 走到尽头，从头开始
-        if (slotIndex > 3) {
-          slotIndex = 0;
-        }
-
-        // 没有找到空位
-        if (slotIndex === index % 4) {
-          slotIndex = -1;
-        }
+      // 没有找到空位
+      if (slotIndex === index % 4) {
+        slotIndex = -1;
       }
-
-      // 没有找到空位，强制插入到默认位置
-      if (slotIndex === -1) {
-        slotIndex = index % 4;
-      }
-
-      // 如果位置已经被占，重新安排原客人
-      if (!placeIsEmpty(canvas, slotIndex)) {
-        placeNormal(canvas, slotIndex + 1, tile, [slotIndex, slotIndex + 4]);
-      }
-
-      // 如果位置已经被占，重新安排原客人
-      if (!placeIsEmpty(canvas, slotIndex + 4)) {
-        placeNormal(canvas, slotIndex + 5, tile, [slotIndex, slotIndex + 4]);
-      }
-
-      // 占坑
-      canvas[slotIndex] = canvas[slotIndex + 4] = index;
-
-      // 画图
-      paint(tile, slotIndex, slotIndex + 4);
     }
-  }
 
-  function placeNormal(canvas, index, tile, skipIndexes) {
-    var slotIndex = index;
+    // 没有找到空位，强制插入到默认位置
+    if (slotIndex === -1) {
+      slotIndex = index % 4;
+    }
 
-    function isInSkip(index) {
+    // 如果位置已经被占，重新安排
+    if (!this.gridIsEmpty(slotIndex)) {
+      this.placeNor(slotIndex + 1, tile, [slotIndex, slotIndex + 4]);
+    }
+
+    // 如果位置已经被占，重新安排
+    if (!this.gridIsEmpty(slotIndex + 4)) {
+      this.placeNor(slotIndex + 5, tile, [slotIndex, slotIndex + 4]);
+    }
+
+    // 占坑
+    grids[slotIndex] = grids[slotIndex + 4] = index;
+
+    // 画图
+    this.paint(tile, slotIndex, slotIndex + 4);
+  };
+
+  // 常规 1*1
+  TileGrid.prototype.placeNor = function(index, tile, skipIndexes) {
+    var grids = this.grids,
+      slotIndex = index;
+
+    function isInSkipIndexes(index) {
       return skipIndexes && (skipIndexes.indexOf(index) !== -1);
     }
 
     // 默认从 index 开始找
-    while (slotIndex !== -1 && (!placeIsEmpty(canvas, slotIndex) || isInSkip(slotIndex))) {
+    while (slotIndex !== -1 && (!this.gridIsEmpty(slotIndex) || isInSkipIndexes(slotIndex))) {
       slotIndex++;
 
       // 走到尽头，从头开始
@@ -99,80 +145,104 @@
 
     if (slotIndex > -1) {
       // 占坑
-      canvas[slotIndex] = index;
+      grids[slotIndex] = index;
 
       // 画图
-      paint(tile, slotIndex);
+      this.paint(tile, slotIndex);
+    }
+  };
+
+  if (typeof define === 'function') {
+    define('tilegrid', function(require, exports, module) {
+      return TileGrid;
+    });
+  } else {
+    global.TileGrid = TileGrid;
+  }
+
+})(this);
+
+/* demo begin */
+(function(window, document) {
+
+  function random() {
+    return Math.random() > 0.5 ? -1 : 1;
+  }
+
+  function attr(elem, data) {
+    var p;
+    for (p in data) {
+      elem.setAttribute(p, data[p]);
+    }
+  }
+
+  function styl(elem, data) {
+    var p;
+    for (p in data) {
+      elem.style[p] = data[p];
     }
   }
 
   function paint(tile, index, index2) {
-    var doc = global.document;
+    var gridBox,
+      tileBox = document.createElement('div'),
+      width = 100,
+      height = 100;
 
-    if (!doc.getElementById('grid')) {
-      doc.body.appendChild((function() {
-        var grid = doc.createElement('div');
-        grid.id = 'grid';
-        grid.style.position = 'relative';
-        grid.style.width = '400px';
-        grid.style.height = '200px';
-        grid.style.border = '1px solid red';
-        return grid;
-      })());
+    if (!(gridBox = document.getElementById('grid'))) {
+      gridBox = document.createElement('div');
+
+      attr(gridBox, {
+        id: 'grid'
+      });
+
+      styl(gridBox, {
+        position: 'relative',
+        width: '400px',
+        height: '200px',
+        border: '1px solid red'
+      });
+
+      document.body.appendChild(gridBox);
     }
 
-    grid.appendChild((function() {
-      var tile = doc.createElement('div');
-      tile.style.position = 'absolute';
-      tile.style.left = 100 * (index % 4) + 'px';
-      tile.style.top = 100 * (index > 3 ? 1 : 0) + 'px';
-      if (typeof index2 === 'undefined') {
-        tile.style.width = '100px';
-        tile.style.height = '100px';
+    if (typeof index2 !== 'undefined') {
+      if (index - index2 === -1) {
+        width = 200;
       } else {
-        if (index - index2 === -1) {
-          tile.style.width = '200px';
-          tile.style.height = '100px';
-        } else {
-          tile.style.width = '100px';
-          tile.style.height = '200px';
-        }
+        height = 200;
       }
-      tile.style.border = '1px solid green';
-      return tile;
-    })());
+    }
+
+    styl(tileBox, {
+      position: 'absolute',
+      left: 100 * (index % 4) + 'px',
+      top: 100 * (index > 3 ? 1 : 0) + 'px',
+      width: width + 'px',
+      height: height + 'px',
+      border: '1px solid green'
+    });
+
+    gridBox.appendChild(tileBox);
   }
 
-  function tile(canvas, tiles) {
-    // 第一轮，排横版
-    tiles.forEach(function(tile, i) {
-      if (tile[0] > 1) {
-        placeBigger(canvas, i, tile);
-      }
-    });
+  var tilegrid = new TileGrid({
+    grids: [-1, -1, -1, -1, -1, -1, -1, -1],
+    tiles: [
+      [1, 1],
+      [1, 1],
+      [1, 1],
+      [1, 1],
+      [2, 1],
+      [1, 2]
+    ].sort(random),
+    paint: paint
+  }).arrange();
 
-    console.log(canvas);
-
-    // 第二轮，排竖版
-    tiles.forEach(function(tile, i) {
-      if (tile[1] > 1) {
-        placeBigger(canvas, i, tile);
-      }
-    });
-
-    console.log(canvas);
-
-    // 第三轮，排常规
-    tiles.forEach(function(tile, i) {
-      if (tile[0] === tile[1]) {
-        placeNormal(canvas, i, tile);
-      }
-    });
-
-    console.log(validate(canvas, tiles), canvas, tiles);
-  }
-
-  function validate(canvas, tiles) {
+  /**
+   * 验证排列是否正确
+   */
+  function validate(grids, tiles) {
     var valid = true;
 
     tiles.forEach(function(tile, i) {
@@ -182,13 +252,13 @@
 
       // 横版
       if (tile[0]  > 1) {
-        canvas.forEach(function(slot, index) {
+        grids.forEach(function(slot, index) {
           if (!valid) {
             return;
           }
 
           if (slot === i) {
-            if (index % 4 > 2 && canvas[index - 1] !== i) {
+            if (index % 4 > 2 && grids[index - 1] !== i) {
               valid = false;
             }
           }
@@ -196,13 +266,13 @@
       }
       // 竖版
       else if (tile[1]  > 1) {
-        canvas.forEach(function(slot, index) {
+        grids.forEach(function(slot, index) {
           if (!valid) {
             return;
           }
 
           if (slot === i) {
-            if (index > 3 && canvas[index - 4] !== i) {
+            if (index > 3 && grids[index - 4] !== i) {
               valid = false;
             }
           }
@@ -213,32 +283,7 @@
     return valid;
   }
 
-  function random() {
-    return Math.random() > 0.5 ? -1 : 1;
-  }
-
-  var n = 1;
-
-  while (n--) {
-    tile([
-      -1, -1, -1, -1,
-      -1, -1, -1, -1
-    ], [
-      [1, 1],
-      [1, 1],
-      [1, 1],
-      [1, 1],
-      [2, 1],
-      [1, 2]
-    ].sort(random));
-  }
-
-  if (typeof define === 'function') {
-    define('tile', function(require, exports, module) {
-      return tile;
-    });
-  } else {
-    global.tile = tile;
-  }
+  console.log(validate(tilegrid.grids, tilegrid.tiles));
 
 })(this, this.document);
+/* demo end */
