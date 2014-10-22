@@ -1,4 +1,4 @@
-(function(window, undefined) {
+(function(window, document, undefined) {
 
   'use strict';
 
@@ -27,6 +27,9 @@
       }
 
       canvas[slotIndex] = canvas[slotIndex + 1] = index;
+
+      // 画图
+      paint(tile, slotIndex, slotIndex + 1);
     }
     // 竖版
     else {
@@ -34,7 +37,7 @@
         slotIndex = slotIndex % 4;
       }
 
-      while (slotIndex !== -1 && !placeIsEmpty(canvas, slotIndex)) {
+      while (slotIndex !== -1 && !(placeIsEmpty(canvas, slotIndex) && placeIsEmpty(canvas, slotIndex + 4))) {
         slotIndex++;
 
         // 走到尽头，从头开始
@@ -64,6 +67,9 @@
       }
 
       canvas[slotIndex] = canvas[slotIndex + 4] = index;
+
+      // 画图
+      paint(tile, slotIndex, slotIndex + 4);
     }
   }
 
@@ -91,7 +97,45 @@
 
     if (slotIndex > -1) {
       canvas[slotIndex] = index;
+
+      // 画图
+      paint(tile, slotIndex);
     }
+  }
+
+  function paint(tile, index, index2) {
+    if (!document.getElementById('grid')) {
+      document.body.appendChild((function() {
+        var grid = document.createElement('div');
+        grid.id = 'grid';
+        grid.style.position = 'relative';
+        grid.style.width = '400px';
+        grid.style.height = '200px';
+        grid.style.border = '1px solid red';
+        return grid;
+      })());
+    }
+
+    grid.appendChild((function() {
+      var tile = document.createElement('div');
+      tile.style.position = 'absolute';
+      tile.style.left = 100 * (index % 4) + 'px';
+      tile.style.top = 100 * (index > 3 ? 1 : 0) + 'px';
+      if (typeof index2 === 'undefined') {
+        tile.style.width = '100px';
+        tile.style.height = '100px';
+      } else {
+        if (index - index2 === -1) {
+          tile.style.width = '200px';
+          tile.style.height = '100px';
+        } else {
+          tile.style.width = '100px';
+          tile.style.height = '200px';
+        }
+      }
+      tile.style.border = '1px solid green';
+      return tile;
+    })());
   }
 
   function order(canvas, tiles) {
@@ -102,12 +146,16 @@
       }
     });
 
+    console.log(canvas);
+
     // 第二轮，排竖版
     tiles.forEach(function(tile, i) {
       if (tile[1] > 1) {
         placeBigger(canvas, i, tile);
       }
     });
+
+    console.log(canvas);
 
     // 第三轮，排常规
     tiles.forEach(function(tile, i) {
@@ -164,7 +212,7 @@
     return Math.random() > 0.5 ? -1 : 1;
   }
 
-  var n = 100;
+  var n = 1;
 
   while (n--) {
     order([
@@ -174,10 +222,10 @@
       [1, 1],
       [1, 1],
       [1, 1],
+      [1, 1],
       [2, 1],
-      [1, 2],
-      [1, 1]
+      [1, 2]
     ].sort(random));
   }
 
-})(this);
+})(this, this.document);
