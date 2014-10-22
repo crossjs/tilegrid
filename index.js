@@ -116,7 +116,7 @@
       }
     });
 
-    console.log(validate(canvas, tiles));
+    console.log(validate(canvas, tiles), canvas, tiles);
   }
 
   function validate(canvas, tiles) {
@@ -156,11 +156,6 @@
         });
       }
     });
-
-    if (!valid) {
-      console.log(tiles);
-      console.log(canvas);
-    }
 
     return valid;
   }
