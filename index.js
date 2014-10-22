@@ -1,4 +1,4 @@
-(function(window, document, undefined) {
+(function(global, document, undefined) {
 
   'use strict';
 
@@ -26,6 +26,7 @@
         placeNormal(canvas, (slotIndex + 3) % 8, tile, [slotIndex, slotIndex + 1]);
       }
 
+      // 占坑
       canvas[slotIndex] = canvas[slotIndex + 1] = index;
 
       // 画图
@@ -66,6 +67,7 @@
         placeNormal(canvas, slotIndex + 5, tile, [slotIndex, slotIndex + 4]);
       }
 
+      // 占坑
       canvas[slotIndex] = canvas[slotIndex + 4] = index;
 
       // 画图
@@ -96,6 +98,7 @@
     }
 
     if (slotIndex > -1) {
+      // 占坑
       canvas[slotIndex] = index;
 
       // 画图
@@ -104,9 +107,11 @@
   }
 
   function paint(tile, index, index2) {
-    if (!document.getElementById('grid')) {
-      document.body.appendChild((function() {
-        var grid = document.createElement('div');
+    var doc = global.document;
+
+    if (!doc.getElementById('grid')) {
+      doc.body.appendChild((function() {
+        var grid = doc.createElement('div');
         grid.id = 'grid';
         grid.style.position = 'relative';
         grid.style.width = '400px';
@@ -117,7 +122,7 @@
     }
 
     grid.appendChild((function() {
-      var tile = document.createElement('div');
+      var tile = doc.createElement('div');
       tile.style.position = 'absolute';
       tile.style.left = 100 * (index % 4) + 'px';
       tile.style.top = 100 * (index > 3 ? 1 : 0) + 'px';
@@ -138,7 +143,7 @@
     })());
   }
 
-  function order(canvas, tiles) {
+  function tile(canvas, tiles) {
     // 第一轮，排横版
     tiles.forEach(function(tile, i) {
       if (tile[0] > 1) {
@@ -215,7 +220,7 @@
   var n = 1;
 
   while (n--) {
-    order([
+    tile([
       -1, -1, -1, -1,
       -1, -1, -1, -1
     ], [
@@ -226,6 +231,14 @@
       [2, 1],
       [1, 2]
     ].sort(random));
+  }
+
+  if (typeof define === 'function') {
+    define('tile', function(require, exports, module) {
+      return tile;
+    });
+  } else {
+    global.tile = tile;
   }
 
 })(this, this.document);
