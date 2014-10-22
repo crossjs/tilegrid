@@ -111,7 +111,7 @@
 
     // 第三轮，排常规
     tiles.forEach(function(tile, i) {
-      if (tile[0] === tile[1] === 1) {
+      if (tile[0] === tile[1]) {
         placeNormal(canvas, i, tile);
       }
     });
