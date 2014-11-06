@@ -1,3 +1,9 @@
+# tilegrid [![spm version](http://spmjs.io/badge/tilegrid)](http://spmjs.io/package/tilegrid)
+
+---
+
+arrange tiles in grids
+
 贴瓷砖问题
 =====
 
@@ -18,4 +24,18 @@
 ■
 ■■
 ■■（翻转90°）
+```
+
+
+## Install
+
+```
+$ spm install tilegrid --save
+```
+
+## Usage
+
+```js
+var tilegrid = require('tilegrid');
+// use tilegrid
 ```

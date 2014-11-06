@@ -1,0 +1,24 @@
+{
+  "name": "tilegrid",
+  "version": "0.0.1",
+  "description": "arrange tiles in grids",
+  "keywords": [],
+  "homepage": "",
+  "author": "crossjs <liwenfu@crossjs.com>",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "licenses": "MIT",
+  "spm": {
+    "main": "tilegrid.js",
+    "dependencies": {
+    },
+    "devDependencies": {
+      "expect.js": "0.3.1"
+    }
+  }
+}
