@@ -4,7 +4,7 @@
 
 > Combine small rects into a big rect.
 
-![](oh-my-glob.gif)
+![](tilegrid.gif)
 
 ## 背景
 
