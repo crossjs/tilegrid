@@ -1,13 +1,14 @@
-# tilegrid [![spm version](http://spmjs.io/badge/tilegrid)](http://spmjs.io/package/tilegrid)
+# tilegrid
 
----
+[![spm version](http://spmjs.io/badge/tilegrid)](http://spmjs.io/package/tilegrid)
 
-arrange tiles in grids
+> Combine small rects into a big rect.
 
-贴瓷砖问题
-=====
+![](oh-my-glob.gif)
 
-在如下尺寸的场地（表格，允许合并单元格）
+## 背景
+
+贴瓷砖，在如下尺寸的场地（表格，允许合并单元格）
 
 ```
 ┌─┬─┬─┬─┐
@@ -26,14 +27,13 @@ arrange tiles in grids
 ■■（翻转90°）
 ```
 
-
-## Install
+## 安装
 
 ```
 $ spm install tilegrid --save
 ```
 
-## Usage
+## 使用
 
 ```js
 var tilegrid = require('tilegrid');
