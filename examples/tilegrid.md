@@ -8,7 +8,12 @@
 <div id="check"></div>
 
 ````javascript
-seajs.use('tilegrid', function(TileGrid) {
+seajs.use('index', function(TileGrid) {
+
+  var grids = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+              .slice(0, 6 + parseInt(Math.random() * 3, 10) * 2);
+
+  console.log(grids.length);
 
   var gridBox = document.getElementById('grid');
 
@@ -17,7 +22,10 @@ seajs.use('tilegrid', function(TileGrid) {
   }
 
   function randomColor() {
-    return 'rgb(' + parseInt(255 * Math.random()) + ', ' + parseInt(255 * Math.random()) + ', ' + parseInt(255 * Math.random()) + ')';
+    return 'rgb(' +
+      parseInt(255 * Math.random()) + ', ' +
+      parseInt(255 * Math.random()) + ', ' +
+      parseInt(255 * Math.random()) + ')';
   }
 
   function styl(elem, data) {
@@ -29,7 +37,7 @@ seajs.use('tilegrid', function(TileGrid) {
 
   styl(gridBox, {
     position: 'relative',
-    width: '400px',
+    width: (grids.length / 2) * 100 + 'px',
     height: '200px',
     border: '10px solid ' + randomColor()
   });
@@ -49,8 +57,8 @@ seajs.use('tilegrid', function(TileGrid) {
 
     styl(tileBox, {
       position: 'absolute',
-      left: 100 * (index % 4) + 'px',
-      top: 100 * (index > 3 ? 1 : 0) + 'px',
+      left: 100 * (index % this.middle) + 'px',
+      top: 100 * (index >= this.middle ? 1 : 0) + 'px',
       width: width + 'px',
       height: height + 'px',
       background: randomColor()
@@ -62,38 +70,49 @@ seajs.use('tilegrid', function(TileGrid) {
   /**
    * 验证排列是否正确
    */
-  function validate(grids, tiles) {
+  function validate(tilegrid) {
     var valid = true;
+
+    var tiles = tilegrid.tiles,
+      grids = tilegrid.grids,
+      length = tilegrid.length,
+      middle = tilegrid.middle;
 
     tiles.forEach(function(tile, i) {
       if (!valid) {
         return;
       }
 
+      if (grids.indexOf(tile) === -1) {
+        return;
+      }
+
       // 横版
-      if (tile[0]  > 1) {
+      if (tile[0] > 1) {
         grids.forEach(function(slot, index) {
           if (!valid) {
             return;
           }
 
-          if (slot === i) {
-            if (index % 4 > 2 && grids[index - 1] !== i) {
+          if (slot === tile) {
+            if (grids[index - 1] !== tile && grids[index + 1] !== tile) {
               valid = false;
+              return;
             }
           }
         });
       }
       // 竖版
-      else if (tile[1]  > 1) {
+      else if (tile[1] > 1) {
         grids.forEach(function(slot, index) {
           if (!valid) {
             return;
           }
 
-          if (slot === i) {
-            if (index > 3 && grids[index - 4] !== i) {
+          if (slot === tile) {
+            if (grids[index - middle] !== tile && grids[index + middle] !== tile) {
               valid = false;
+              return;
             }
           }
         });
@@ -104,8 +123,18 @@ seajs.use('tilegrid', function(TileGrid) {
   }
 
   var tilegrid = new TileGrid({
-    grids: [-1, -1, -1, -1, -1, -1, -1, -1],
+    grids: grids,
     tiles: [
+      [1, 1],
+      [1, 1],
+      [1, 1],
+      [1, 1],
+      [1, 1],
+      [1, 1],
+      [2, 1],
+      [1, 2],
+      [1, 1],
+      [1, 1],
       [1, 1],
       [1, 1],
       [1, 1],
@@ -116,6 +145,6 @@ seajs.use('tilegrid', function(TileGrid) {
     paint: paint
   }).arrange();
 
-  document.getElementById('check').innerHTML = '铺贴结果：' + (validate(tilegrid.grids, tilegrid.tiles) ? '正确' : '错误');
+  document.getElementById('check').innerHTML = '随机铺贴结果：' + (validate(tilegrid) ? '正确' : '错误');
 });
 ````

@@ -1,20 +1,23 @@
 {
   "name": "tilegrid",
-  "version": "0.0.1",
-  "description": "arrange tiles in grids",
+  "version": "0.1.0",
+  "description": "Combine small rects into a big rect.",
   "keywords": [],
-  "homepage": "",
-  "author": "crossjs <liwenfu@crossjs.com>",
+  "homepage": "https://github.com/crossjs/tilegrid",
+  "author": {
+    "name": "crossjs",
+    "email": "liwenfu@crossjs.com"
+  },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/crossjs/tilegrid"
   },
   "bugs": {
-    "url": ""
+    "url": "https://github.com/crossjs/tilegrid/issues"
   },
   "licenses": "MIT",
   "spm": {
-    "main": "tilegrid.js",
+    "main": "index.js",
     "dependencies": {
     },
     "devDependencies": {
